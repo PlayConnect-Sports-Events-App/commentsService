@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
-//@EnableDiscoveryClient //todo: uncomment this line
+@EnableDiscoveryClient
 public class CommentServiceApplication {
 
 	public static void main(String[] args) {
