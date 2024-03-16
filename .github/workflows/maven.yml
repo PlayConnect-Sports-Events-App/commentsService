@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build Comments Service
+name: Comments Service
 
 on:
   push:
@@ -15,7 +15,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -25,7 +25,32 @@ jobs:
           MYSQL_DATABASE: comment-db
         ports:
           - 3306:3306
-    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Run Tests
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/comment-db?useSSL=false&allowPublicKeyRetrieval=true
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: lucho
+      run: mvn test --file pom.xml -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: lucho
+          MYSQL_DATABASE: comment-db
+        ports:
+          - 3306:3306
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
