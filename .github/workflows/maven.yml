@@ -16,9 +16,16 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: lucho
+          MYSQL_DATABASE: comment-db
+        ports:
+          - 3306:3306
+    
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -28,4 +35,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      env:
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/comment-db?useSSL=false&allowPublicKeyRetrieval=true
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: lucho
+      run: mvn -B package --file pom.xml -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
