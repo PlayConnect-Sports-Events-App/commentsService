@@ -18,7 +18,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public void createComment(CommentRequest commentRequest) {
+    public CommentResponse createComment(CommentRequest commentRequest) {
         Comment comment = Comment.builder()
                 .eventId(commentRequest.getEventId())
                 .userId(commentRequest.getUserId())
@@ -28,6 +28,7 @@ public class CommentService {
 
         commentRepository.save(comment);
         log.info("Comment {} is saved", comment.getCommentId());
+        return mapToCommentResponse(comment);
     }
 
     public List<CommentResponse> getCommentsForEvent(Long eventId) {

@@ -18,8 +18,8 @@ public class CommentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createComment(@RequestBody CommentRequest commentRequest){
-        commentService.createComment(commentRequest);
+    public CommentResponse createComment(@RequestBody CommentRequest commentRequest){
+        return commentService.createComment(commentRequest);
     }
 
     @GetMapping("/{eventId}")
