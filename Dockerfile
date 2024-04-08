@@ -13,6 +13,12 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-slim
 WORKDIR /app
 
+# Set the timezone so that the comment posted time is correct
+ENV TZ=Europe/Amsterdam
+RUN apt-get update && apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+
 # Copy the JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
