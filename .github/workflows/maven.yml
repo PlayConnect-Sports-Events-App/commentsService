@@ -15,13 +15,31 @@ on:
     branches: [ "main" ]
 
 jobs:
+  git_guardian:
+    name: GitGuardian scan
+    runs-on: ubuntu-latest
+    continue-on-error: true # This ensures that subsequent jobs will run even if this job fails.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # fetch all history so multiple commits can be scanned
+      - name: GitGuardian scan
+        uses: GitGuardian/ggshield/actions/secret@v1.25.0
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
   test:
     runs-on: ubuntu-latest
     services:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: lucho
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: comment-db
         ports:
           - 3306:3306
@@ -36,8 +54,8 @@ jobs:
     - name: Run Tests
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/comment-db?useSSL=false&allowPublicKeyRetrieval=true
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: lucho
+        SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+        SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
       run: mvn test --file pom.xml -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
   build:
@@ -47,7 +65,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: lucho
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: comment-db
         ports:
           - 3306:3306
@@ -62,8 +80,8 @@ jobs:
     - name: Build with Maven
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/comment-db?useSSL=false&allowPublicKeyRetrieval=true
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: lucho
+        SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+        SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
       run: mvn -B package --file pom.xml -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
   docker-publish:
@@ -76,8 +94,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
-          username: luchoo
-          password: dckr_pat_XhqG0UEN8_E0Eupyce8tyfI4nBE
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
