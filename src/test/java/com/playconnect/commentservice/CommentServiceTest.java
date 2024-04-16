@@ -1,11 +1,10 @@
-package com.playconnect.commentservice.unittests;
+package com.playconnect.commentservice;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.ArrayList;
 
 import com.playconnect.commentservice.dto.CommentRequest;
 import com.playconnect.commentservice.dto.CommentResponse;

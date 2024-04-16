@@ -1,8 +1,7 @@
-package com.playconnect.commentservice.integrationtests;
+package com.playconnect.commentservice;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playconnect.commentservice.controller.CommentController;
