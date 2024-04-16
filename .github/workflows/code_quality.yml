@@ -39,7 +39,7 @@ jobs:
         path: target/site/jacoco/jacoco.xml
 
     - name: Run Qodana Analysis
-      uses: JetBrains/qodana-action@v2
+      uses: actions/checkout@v3
       with:
         project-dir: ${{ github.workspace }}
         results-dir: ${{ github.workspace }}/qodana-results
@@ -47,7 +47,7 @@ jobs:
         additional-parameters: '--data-dir ${GITHUB_WORKSPACE}/target/coverage-reports/jacoco.xml' # Assuming JaCoCo outputs to this directory, adjust if necessary
 
     - name: Upload Qodana Results
-      uses: actions/upload-artifact@v2
+      uses: JetBrains/qodana-action@v2023.3
       with:
         name: Qodana Report
         path: qodana-results
