@@ -89,7 +89,7 @@
 					<project>java-spring-boot</project>
 
 					<!-- in case you're self hosting, provide the URL here -->
-					<url>http://localhost:8084/</url>
+					<!-- <url>http://localhost:8084/</url> -->
 					<!-- provide your auth token via SENTRY_AUTH_TOKEN environment variable -->
 					<authToken>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</authToken>
 				</configuration>
