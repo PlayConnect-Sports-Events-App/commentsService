@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y tzdata && \
 COPY --from=build /app/target/*.jar app.jar
 
 # Expose the port the application runs on
-
+EXPOSE 8084
 
 # Command to run the application
 CMD ["java", "-jar", "app.jar"]
