@@ -114,6 +114,30 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version> <!-- Use the latest version available -->
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal> <!-- Prepares the property pointing to the JaCoCo runtime agent which is passed as a JVM argument to the Maven test goal. -->
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase> <!-- Bind to the verify phase to generate report after tests are executed. -->
+						<goals>
+							<goal>report</goal> <!-- Creates a JaCoCo coverage report. -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Configuration for the report goal -->
+					<outputDirectory>${project.build.directory}/coverage-reports</outputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
