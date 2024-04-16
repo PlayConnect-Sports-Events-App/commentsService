@@ -43,11 +43,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: JaCoCo Coverage Report
-          path: target/site/jacoco/jacoco.xml
+          path: target/coverage-reports/index.html
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2023.3
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
           linter: "your-linter-type"  # Specify the linter, e.g., "java"
-          additional-parameters: "--show-report -v /target/site/jacoco/jacoco.xml:/data/project/coverage-report"
+          additional-parameters: "--show-report -v /target/coverage-reports/index.html:/data/project/coverage-report"
