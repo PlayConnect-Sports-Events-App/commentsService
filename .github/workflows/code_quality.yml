@@ -8,46 +8,18 @@ on:
       - 'releases/*' # The release branches
 
 jobs:
-  test:
+  qodana:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: comment-db
-        ports:
-          - 3306:3306
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Run Tests
-      env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/comment-db?useSSL=false&allowPublicKeyRetrieval=true
-        SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-        SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-      run: mvn test --file pom.xml -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-    - name: Upload JaCoCo Coverage Report
-      uses: actions/upload-artifact@v2
-      with:
-        name: JaCoCo Coverage Report
-        path: target/site/jacoco/jacoco.xml
-
-    - name: Run Qodana Analysis
-      uses: actions/checkout@v3
-      with:
-        project-dir: ${{ github.workspace }}
-        results-dir: ${{ github.workspace }}/qodana-results
-        cache-dir: ${{ github.workspace }}/.qodana
-        additional-parameters: '--data-dir ${GITHUB_WORKSPACE}/target/coverage-reports/jacoco.xml' # Assuming JaCoCo outputs to this directory, adjust if necessary
-
-    - name: Upload Qodana Results
-      uses: JetBrains/qodana-action@v2023.3
-      with:
-        name: Qodana Report
-        path: qodana-results
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0  # a full history is required for pull request analysis
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2023.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
