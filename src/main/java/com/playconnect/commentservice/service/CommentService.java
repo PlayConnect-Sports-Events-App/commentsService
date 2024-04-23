@@ -26,9 +26,9 @@ public class CommentService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        commentRepository.save(comment);
-        log.info("Comment {} is saved", comment.getCommentId());
-        return mapToCommentResponse(comment);
+        Comment savedComment = commentRepository.save(comment);
+        log.info("Comment {} is saved", savedComment.getCommentId());
+        return mapToCommentResponse(savedComment);
     }
 
     public List<CommentResponse> getCommentsForEvent(Long eventId) {

@@ -3,7 +3,9 @@ package com.playconnect.commentservice;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import com.playconnect.commentservice.dto.CommentRequest;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -38,15 +41,31 @@ public class CommentServiceTest {
 
     @Test
     void testCreateComment() {
+        // Setup input and mocked response
         CommentRequest commentRequest = new CommentRequest(1L, 2L, "Nice event!");
-        Comment savedComment = new Comment(1L, 1L, 2L, "Nice event!", LocalDateTime.now());
+        LocalDateTime testTime = LocalDateTime.now();
+        Comment savedComment = new Comment(1L, 1L, 2L, "Nice event!", testTime);
         when(commentRepository.save(any(Comment.class))).thenReturn(savedComment);
 
+        // Execute the service method
         CommentResponse result = commentService.createComment(commentRequest);
 
+        // Assert results
         assertNotNull(result);
-        assertEquals(commentRequest.getContent(), result.getContent());
+        assertEquals(savedComment.getCommentId(), result.getCommentId());
+        assertEquals(savedComment.getUserId(), result.getUserId());
+        assertEquals(savedComment.getEventId(), result.getEventId());
+        assertEquals(savedComment.getContent(), result.getContent());
+        assertTrue(Duration.between(testTime, result.getCreatedAt()).getSeconds() < 1, "Creation time should be near current time");
         verify(commentRepository).save(any(Comment.class));
+    }
+
+    @Test
+    void testCreateComment_ThrowsException() {
+        CommentRequest commentRequest = new CommentRequest(1L, 2L, "Nice event!");
+        when(commentRepository.save(any(Comment.class))).thenThrow(new DataAccessException("Error accessing data") {});
+
+        assertThrows(DataAccessException.class, () -> commentService.createComment(commentRequest));
     }
 
     @Test
@@ -63,6 +82,16 @@ public class CommentServiceTest {
         assertFalse(results.isEmpty());
         assertEquals(2, results.size());
         assertEquals("Good job!", results.get(0).getContent());
+        verify(commentRepository).findByEventId(1L);
+    }
+
+    @Test
+    void testGetCommentsForEvent_NoComments() {
+        when(commentRepository.findByEventId(anyLong())).thenReturn(Collections.emptyList());
+
+        List<CommentResponse> results = commentService.getCommentsForEvent(1L);
+
+        assertTrue(results.isEmpty());
         verify(commentRepository).findByEventId(1L);
     }
 
