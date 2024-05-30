@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.playconnect.commentservice.dto.CommentRequest;
 import com.playconnect.commentservice.dto.CommentResponse;
+import com.playconnect.commentservice.filter.ProfanityFilter;
 import com.playconnect.commentservice.model.Comment;
 import com.playconnect.commentservice.repository.CommentRepository;
 import com.playconnect.commentservice.service.CommentService;
@@ -30,13 +31,15 @@ public class CommentServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private ProfanityFilter profanityFilter;
 
     @InjectMocks
     private CommentService commentService;
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(commentRepository);  // Explicit constructor injection
+        commentService = new CommentService(commentRepository, profanityFilter);  // Explicit constructor injection
     }
 
     @Test

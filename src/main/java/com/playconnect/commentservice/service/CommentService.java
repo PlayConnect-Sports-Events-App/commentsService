@@ -2,6 +2,8 @@ package com.playconnect.commentservice.service;
 
 import com.playconnect.commentservice.dto.CommentRequest;
 import com.playconnect.commentservice.dto.CommentResponse;
+import com.playconnect.commentservice.error.ProfanityException;
+import com.playconnect.commentservice.filter.ProfanityFilter;
 import com.playconnect.commentservice.model.Comment;
 import com.playconnect.commentservice.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,12 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final ProfanityFilter profanityFilter;
 
     public CommentResponse createComment(CommentRequest commentRequest) {
+        if (profanityFilter.containsProfanity(commentRequest.getContent())) {
+            throw new ProfanityException("Comment contains offensive language.");
+        }
         Comment comment = Comment.builder()
                 .eventId(commentRequest.getEventId())
                 .userId(commentRequest.getUserId())
