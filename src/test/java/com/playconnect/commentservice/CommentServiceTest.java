@@ -16,30 +16,28 @@ import com.playconnect.commentservice.repository.CommentRepository;
 import com.playconnect.commentservice.service.CommentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
 
-    @Mock
+    @MockBean
     private CommentRepository commentRepository;
-    @Mock
+
+    @MockBean
     private ProfanityFilter profanityFilter;
 
-    @InjectMocks
+    @Autowired
     private CommentService commentService;
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(commentRepository, profanityFilter);  // Explicit constructor injection
+        // No need to explicitly initialize commentService, as Spring will inject the mocks
     }
 
     @Test
